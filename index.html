@@ -289,10 +289,10 @@ footer .logo-line span{ color:var(--accent); }
       <label>Factory</label>
       <select id="factoryFilter">
         <option value="all">All Factories</option>
-        <option value="Bangladesh">Bangladesh</option>
-        <option value="India">India</option>
-        <option value="China - IFA">China - IFA</option>
-        <option value="China - IFJS">China - IFJS</option>
+        <option value="IFBD">IFBD (Bangladesh)</option>
+        <option value="IFI">IFI (India)</option>
+        <option value="IFA">IFA (China)</option>
+        <option value="IFJS">IFJS (China)</option>
       </select>
     </div>
     <div class="field">
@@ -325,9 +325,9 @@ footer .logo-line span{ color:var(--accent); }
       <div class="delta" id="kpiOrdersSub">across all factories</div>
     </div>
     <div class="kpi" style="--kpi-glow:var(--accent-2)">
-      <div class="label">Avg PI Value</div>
-      <div class="value" id="kpiAvg">$0</div>
-      <div class="delta">per proforma invoice</div>
+      <div class="label">Top Buyer</div>
+      <div class="value" id="kpiTopBuyer">—</div>
+      <div class="delta" id="kpiTopBuyerSub">by PI value</div>
     </div>
     <div class="kpi" style="--kpi-glow:var(--accent)">
       <div class="label">Top Sales Person</div>
@@ -338,6 +338,11 @@ footer .logo-line span{ color:var(--accent); }
       <div class="label">Top Customer</div>
       <div class="value" id="kpiTopCustomer">—</div>
       <div class="delta" id="kpiTopCustomerSub">by PI value</div>
+    </div>
+    <div class="kpi" style="--kpi-glow:var(--accent-2)">
+      <div class="label">New Sales</div>
+      <div class="value" id="kpiNewSales">0</div>
+      <div class="delta" id="kpiNewSalesSub">new customer/buyer PIs</div>
     </div>
   </div>
 
@@ -354,7 +359,7 @@ footer .logo-line span{ color:var(--accent); }
 
   <div class="chart-grid">
     <div class="card">
-      <h3>PI Value by Factory <span>(Bangladesh / India / China - IFA / China - IFJS)</span></h3>
+      <h3>PI Value by Factory <span>(IFBD / IFI / IFA / IFJS)</span></h3>
       <div class="chart-box"><canvas id="chartFactory"></canvas></div>
     </div>
     <div class="card">
@@ -378,7 +383,7 @@ footer .logo-line span{ color:var(--accent); }
 <div class="view" id="view-entry">
   <div class="page-head">
     <h2>Daily PI Entry</h2>
-    <p>Add a new Proforma Invoice record. It syncs instantly to the shared Google Sheet for all colleagues.</p>
+    <p>Add a new Proforma Invoice record. It syncs instantly to the shared Google Sheet for all colleagues. Mark <b>"New Sales = Yes"</b> if this PI is from a brand new customer or buyer.</p>
   </div>
 
   <div class="card">
@@ -422,15 +427,22 @@ footer .logo-line span{ color:var(--accent); }
       <div class="field">
         <label>Factory</label>
         <select id="f_factory">
-          <option value="Bangladesh">Bangladesh</option>
-          <option value="India">India</option>
-          <option value="China - IFA">China - IFA</option>
-          <option value="China - IFJS">China - IFJS</option>
+          <option value="IFBD">IFBD (Bangladesh)</option>
+          <option value="IFI">IFI (India)</option>
+          <option value="IFA">IFA (China)</option>
+          <option value="IFJS">IFJS (China)</option>
         </select>
       </div>
       <div class="field">
         <label>Sales Person Name</label>
         <input type="text" id="f_sales" placeholder="e.g. Towhid Ahmed">
+      </div>
+      <div class="field">
+        <label>New Sales</label>
+        <select id="f_newsales">
+          <option value="No">No</option>
+          <option value="Yes">Yes — New Customer/Buyer</option>
+        </select>
       </div>
     </div>
     <div class="actions-row">
@@ -460,7 +472,7 @@ footer .logo-line span{ color:var(--accent); }
         <thead>
           <tr>
             <th>PI Date</th><th>PI No</th><th>Customer</th><th>Buyer</th><th>Item Code</th>
-            <th>Generic Item</th><th>Style Ref</th><th>PI Value</th><th>Factory</th><th>Sales Person</th><th></th>
+            <th>Generic Item</th><th>Style Ref</th><th>PI Value</th><th>Factory</th><th>Sales Person</th><th>New Sales</th><th></th>
           </tr>
         </thead>
         <tbody id="tableBody"></tbody>
@@ -651,7 +663,8 @@ async function deleteRemote(rowIndex){
 function clearForm(){
   ['f_date','f_pino','f_customer','f_buyer','f_itemcode','f_style','f_value','f_sales'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('f_generic').value='Nylon';
-  document.getElementById('f_factory').value='Bangladesh';
+  document.getElementById('f_factory').value='IFBD';
+  document.getElementById('f_newsales').value='No';
   editingRowIndex = null;
   document.getElementById('addBtn').textContent = '＋ Add Record';
   document.getElementById('entryStatus').textContent = '';
@@ -668,7 +681,8 @@ async function addRecord(){
     style: document.getElementById('f_style').value.trim(),
     value: parseFloat(document.getElementById('f_value').value) || 0,
     factory: document.getElementById('f_factory').value,
-    sales: document.getElementById('f_sales').value.trim()
+    sales: document.getElementById('f_sales').value.trim(),
+    newsales: document.getElementById('f_newsales').value
   };
   if(!rec.date || !rec.pino || !rec.customer || !rec.value){
     toast('Please fill at least Date, PI No, Customer and PI Value', 'err');
@@ -724,8 +738,9 @@ function editRecord(localIndex){
   document.getElementById('f_generic').value = rec.generic || 'Nylon';
   document.getElementById('f_style').value = rec.style || '';
   document.getElementById('f_value').value = rec.value || '';
-  document.getElementById('f_factory').value = rec.factory || 'Bangladesh';
+  document.getElementById('f_factory').value = rec.factory || 'IFBD';
   document.getElementById('f_sales').value = rec.sales || '';
+  document.getElementById('f_newsales').value = rec.newsales || 'No';
 
   document.getElementById('addBtn').textContent = '✓ Save Changes';
   document.getElementById('entryStatus').textContent = 'Editing existing record — make changes and click "Save Changes".';
@@ -768,6 +783,7 @@ function renderTable(){
       <td>$${Number(r.value||0).toLocaleString(undefined,{minimumFractionDigits:2})}</td>
       <td><span class="tag tag-factory">${r.factory||''}</span></td>
       <td>${r.sales||''}</td>
+      <td>${r.newsales==='Yes' ? '<span class="tag tag-vislon">New</span>' : '<span class="tag tag-factory">—</span>'}</td>
       <td>
         <button class="row-del" style="color:var(--accent-3)" onclick="editRecord(${i})">Edit</button>
         <button class="row-del" onclick="removeRecord(${i})">Delete</button>
@@ -869,7 +885,18 @@ function renderDashboard(){
   document.getElementById('kpiTotal').textContent = '$'+total.toLocaleString(undefined,{maximumFractionDigits:0});
   document.getElementById('kpiTotalSub').textContent = data.length+' PIs in selection';
   document.getElementById('kpiOrders').textContent = data.length;
-  document.getElementById('kpiAvg').textContent = '$'+(data.length?Math.round(total/data.length):0).toLocaleString();
+
+  // Top buyer
+  const byBuyer = groupSum(data,'buyer');
+  const topBuyer = topEntry(byBuyer);
+  document.getElementById('kpiTopBuyer').textContent = topBuyer[0] || '—';
+  document.getElementById('kpiTopBuyerSub').textContent = topBuyer[1]!==undefined ? '$'+topBuyer[1].toLocaleString() : 'no data';
+
+  // New sales
+  const newSalesRecords = data.filter(r=>r.newsales==='Yes');
+  const newSalesValue = newSalesRecords.reduce((s,r)=>s+Number(r.value||0),0);
+  document.getElementById('kpiNewSales').textContent = newSalesRecords.length;
+  document.getElementById('kpiNewSalesSub').textContent = newSalesRecords.length ? ('$'+newSalesValue.toLocaleString()+' in new business') : 'new customer/buyer PIs';
 
   // Top sales person
   const bySales = groupSum(data,'sales');
@@ -990,45 +1017,179 @@ function legendStyle(){
   return { legend:{ display:true, position:'bottom', labels:{ color:'#7c8aa3', boxWidth:12, padding:14, font:{size:11} } } };
 }
 
+/* ---------- Breakdown helper for exports ---------- */
+function getBreakdowns(data){
+  const trendMap = {};
+  data.forEach(r=>{
+    if(!r.date) return;
+    const d = new Date(r.date);
+    const key = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+    trendMap[key] = (trendMap[key]||0) + Number(r.value||0);
+  });
+  const trend = Object.keys(trendMap).sort().map(k=>[k, trendMap[k]]);
+  const byItem = Object.entries(groupSum(data,'generic'));
+  const byFactory = Object.entries(groupSum(data,'factory'));
+  const bySales = Object.entries(groupSum(data,'sales'));
+  const byCustomer = Object.entries(groupSum(data,'customer')).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  const byBuyer = Object.entries(groupSum(data,'buyer')).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  return {trend, byItem, byFactory, bySales, byCustomer, byBuyer};
+}
+
 /* ---------- Exports ---------- */
 function exportExcel(){
   const data = getFilteredForDashboard();
   if(data.length===0){ toast('No data in current filter to export','err'); return; }
-  const rows = data.map(r=>({
-    'PI Date': r.date, 'Proforma Invoice No': r.pino, 'Customer Name': r.customer, 'Buyer Name': r.buyer,
-    'Item Code': r.itemcode, 'Generic Item': r.generic, 'Style Reference': r.style,
-    'PI Value (USD)': r.value, 'Factory': r.factory, 'Sales Person Name': r.sales
-  }));
-  const ws = XLSX.utils.json_to_sheet(rows);
+  const total = data.reduce((s,r)=>s+Number(r.value||0),0);
+  const newSalesCount = data.filter(r=>r.newsales==='Yes').length;
+
   const wb = XLSX.utils.book_new();
+
+  /* ---- Sheet 1: Sales Report (mirrors PDF layout) ---- */
+  const aoa = [
+    ['SALES REPORT'],
+    ['Generated: '+new Date().toLocaleString()],
+    ['Total PI Value: $'+total.toLocaleString(undefined,{minimumFractionDigits:2}), '', 'Total PIs: '+data.length, '', 'New Sales: '+newSalesCount],
+    [],
+    ['PI Date','Proforma Invoice No','Customer Name','Buyer Name','Item Code','Generic Item','Style Reference','PI Value (USD)','Factory','Sales Person Name','New Sales']
+  ];
+  data.forEach(r=>{
+    aoa.push([r.date, r.pino, r.customer, r.buyer, r.itemcode, r.generic, r.style, Number(r.value||0), r.factory, r.sales, r.newsales||'No']);
+  });
+  aoa.push([]);
+  aoa.push(['Sales Command Center — System designed & engineered by Towhid']);
+
+  const ws = XLSX.utils.aoa_to_sheet(aoa);
+  ws['!merges'] = [
+    {s:{r:0,c:0}, e:{r:0,c:10}},
+    {s:{r:1,c:0}, e:{r:1,c:10}}
+  ];
+  ws['!cols'] = [{wch:12},{wch:18},{wch:22},{wch:18},{wch:14},{wch:12},{wch:14},{wch:14},{wch:10},{wch:18},{wch:10}];
   XLSX.utils.book_append_sheet(wb, ws, 'Sales Report');
+
+  /* ---- Sheet 2: Chart Data (data behind each dashboard graph) ---- */
+  const bd = getBreakdowns(data);
+  const aoa2 = [];
+  aoa2.push(['SALES REPORT — VISUAL ANALYSIS DATA']);
+  aoa2.push([]);
+  aoa2.push(['PI Value Over Time (Monthly Trend)']);
+  aoa2.push(['Month','PI Value']);
+  bd.trend.forEach(row=>aoa2.push(row));
+  aoa2.push([]);
+  aoa2.push(['Mix by Generic Item']);
+  aoa2.push(['Generic Item','PI Value']);
+  bd.byItem.forEach(row=>aoa2.push(row));
+  aoa2.push([]);
+  aoa2.push(['PI Value by Factory']);
+  aoa2.push(['Factory','PI Value']);
+  bd.byFactory.forEach(row=>aoa2.push(row));
+  aoa2.push([]);
+  aoa2.push(['PI Value by Sales Person']);
+  aoa2.push(['Sales Person','PI Value']);
+  bd.bySales.forEach(row=>aoa2.push(row));
+  aoa2.push([]);
+  aoa2.push(['Top Customers by PI Value']);
+  aoa2.push(['Customer','PI Value']);
+  bd.byCustomer.forEach(row=>aoa2.push(row));
+  aoa2.push([]);
+  aoa2.push(['Top Buyers by PI Value']);
+  aoa2.push(['Buyer','PI Value']);
+  bd.byBuyer.forEach(row=>aoa2.push(row));
+  aoa2.push([]);
+  aoa2.push(['Sales Command Center — System designed & engineered by Towhid']);
+
+  const ws2 = XLSX.utils.aoa_to_sheet(aoa2);
+  ws2['!merges'] = [{s:{r:0,c:0}, e:{r:0,c:1}}];
+  ws2['!cols'] = [{wch:26},{wch:16}];
+  XLSX.utils.book_append_sheet(wb, ws2, 'Chart Data');
+
   XLSX.writeFile(wb, 'sales_report_'+new Date().toISOString().slice(0,10)+'.xlsx');
   toast('Excel exported ✓');
 }
 
-function exportPDF(){
+function addPdfBranding(doc){
+  doc.setFontSize(8);
+  doc.text('Sales Command Center — System designed & engineered by Towhid', 14, doc.internal.pageSize.height-8);
+}
+
+async function exportPDF(){
   const data = getFilteredForDashboard();
   if(data.length===0){ toast('No data in current filter to export','err'); return; }
+
+  toast('Generating PDF report...');
+
+  // Ensure dashboard charts exist and reflect current filters, even if user is on another tab
+  const dashboardView = document.getElementById('view-dashboard');
+  const wasActive = dashboardView.classList.contains('active');
+  const prevActiveBtn = document.querySelector('.nav-btn.active');
+  if(!wasActive){
+    document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+    dashboardView.classList.add('active');
+    dashboardView.style.position='fixed';
+    dashboardView.style.left='-9999px';
+    dashboardView.style.top='0';
+    renderDashboard();
+    await new Promise(r=>setTimeout(r, 400));
+  }
+
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({orientation:'landscape'});
   const total = data.reduce((s,r)=>s+Number(r.value||0),0);
+  const newSalesCount = data.filter(r=>r.newsales==='Yes').length;
 
   doc.setFontSize(16);
   doc.text('Sales Report', 14, 16);
   doc.setFontSize(10);
   doc.text('Generated: '+new Date().toLocaleString(), 14, 22);
-  doc.text('Total PI Value: $'+total.toLocaleString(undefined,{minimumFractionDigits:2})+'   |   Total PIs: '+data.length, 14, 28);
+  doc.text('Total PI Value: $'+total.toLocaleString(undefined,{minimumFractionDigits:2})+'   |   Total PIs: '+data.length+'   |   New Sales: '+newSalesCount, 14, 28);
 
   doc.autoTable({
     startY:34,
-    head:[['PI Date','PI No','Customer','Buyer','Item Code','Generic','Style Ref','PI Value (USD)','Factory','Sales Person']],
-    body:data.map(r=>[r.date,r.pino,r.customer,r.buyer,r.itemcode,r.generic,r.style,'$'+Number(r.value||0).toLocaleString(undefined,{minimumFractionDigits:2}),r.factory,r.sales]),
+    head:[['PI Date','PI No','Customer','Buyer','Item Code','Generic','Style Ref','PI Value (USD)','Factory','Sales Person','New Sales']],
+    body:data.map(r=>[r.date,r.pino,r.customer,r.buyer,r.itemcode,r.generic,r.style,'$'+Number(r.value||0).toLocaleString(undefined,{minimumFractionDigits:2}),r.factory,r.sales,r.newsales||'No']),
     styles:{ fontSize:8 },
     headStyles:{ fillColor:[15,22,35] }
   });
+  addPdfBranding(doc);
 
-  doc.setFontSize(8);
-  doc.text('Sales Command Center — System designed & engineered by Towhid', 14, doc.internal.pageSize.height-8);
+  // ---- Visual Analysis pages: embed actual dashboard charts as images ----
+  const chartList = [
+    {key:'trend', title:'PI Value Over Time'},
+    {key:'item', title:'Mix by Generic Item'},
+    {key:'factory', title:'PI Value by Factory'},
+    {key:'sales', title:'PI Value by Sales Person'},
+    {key:'customer', title:'Top Customers by PI Value'}
+  ];
+
+  for(let i=0;i<chartList.length;i+=2){
+    doc.addPage();
+    doc.setFontSize(14);
+    doc.text('Visual Analysis', 14, 16);
+
+    const c1 = chartList[i];
+    if(charts[c1.key]){
+      doc.setFontSize(10);
+      doc.text(c1.title, 14, 26);
+      const img1 = charts[c1.key].toBase64Image();
+      doc.addImage(img1, 'PNG', 14, 30, 125, 80);
+    }
+    const c2 = chartList[i+1];
+    if(c2 && charts[c2.key]){
+      doc.setFontSize(10);
+      doc.text(c2.title, 150, 26);
+      const img2 = charts[c2.key].toBase64Image();
+      doc.addImage(img2, 'PNG', 150, 30, 125, 80);
+    }
+    addPdfBranding(doc);
+  }
+
+  // restore original view if we switched
+  if(!wasActive){
+    dashboardView.classList.remove('active');
+    dashboardView.style.position='';
+    dashboardView.style.left='';
+    dashboardView.style.top='';
+    document.getElementById('view-'+prevActiveBtn.dataset.view).classList.add('active');
+  }
 
   doc.save('sales_report_'+new Date().toISOString().slice(0,10)+'.pdf');
   toast('PDF exported ✓');
@@ -1051,7 +1212,8 @@ function downloadScript(){
       style: row[6],
       value: row[7],
       factory: row[8],
-      sales: row[9]
+      sales: row[9],
+      newsales: row[10] || 'No'
     };
   });
   return ContentService.createTextOutput(JSON.stringify({records: records}))
@@ -1064,11 +1226,11 @@ function doPost(e) {
 
   if (body.action === 'add') {
     var r = body.record;
-    sheet.appendRow([r.date, r.pino, r.customer, r.buyer, r.itemcode, r.generic, r.style, r.value, r.factory, r.sales]);
+    sheet.appendRow([r.date, r.pino, r.customer, r.buyer, r.itemcode, r.generic, r.style, r.value, r.factory, r.sales, r.newsales || 'No']);
   } else if (body.action === 'update') {
     var r = body.record;
     var rowIndex = body.rowIndex;
-    sheet.getRange(rowIndex, 1, 1, 10).setValues([[r.date, r.pino, r.customer, r.buyer, r.itemcode, r.generic, r.style, r.value, r.factory, r.sales]]);
+    sheet.getRange(rowIndex, 1, 1, 11).setValues([[r.date, r.pino, r.customer, r.buyer, r.itemcode, r.generic, r.style, r.value, r.factory, r.sales, r.newsales || 'No']]);
   } else if (body.action === 'delete') {
     sheet.deleteRow(body.rowIndex);
   }
