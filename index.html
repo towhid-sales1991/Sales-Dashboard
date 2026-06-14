@@ -168,7 +168,14 @@ body{
 .card h3 span{ color:var(--muted); font-weight:500; font-size:12px; }
 
 /* Table */
-.table-wrap{ overflow-x:auto; border-radius:10px; border:1px solid var(--line); }
+.table-wrap{
+  overflow-x:auto; overflow-y:auto; max-height:65vh;
+  border-radius:10px; border:1px solid var(--line);
+}
+.table-wrap::-webkit-scrollbar{ height:10px; width:10px; }
+.table-wrap::-webkit-scrollbar-track{ background:#0b1220; }
+.table-wrap::-webkit-scrollbar-thumb{ background:#2a3b58; border-radius:6px; }
+.table-wrap::-webkit-scrollbar-thumb:hover{ background:var(--accent-3); }
 table{ width:100%; border-collapse:collapse; font-size:13px; min-width:1000px; }
 thead th{
   background:#0b1220; text-align:left; padding:12px 14px; font-size:11px; text-transform:uppercase;
@@ -311,6 +318,7 @@ footer .logo-line span{ color:var(--accent); }
       </select>
     </div>
     <button class="btn btn-secondary" onclick="applyFilters()">Apply Filters</button>
+    <button class="btn btn-secondary" onclick="clearFilters()">✕ Clear Filters</button>
   </div>
 
   <div class="kpi-grid">
@@ -868,6 +876,19 @@ document.getElementById('periodFilter').addEventListener('change', e=>{
 });
 
 function applyFilters(){ renderDashboard(); }
+
+function clearFilters(){
+  document.getElementById('periodFilter').value = 'all';
+  document.getElementById('factoryFilter').value = 'all';
+  document.getElementById('itemFilter').value = 'all';
+  document.getElementById('salesFilter').value = 'all';
+  document.getElementById('dateFrom').value = '';
+  document.getElementById('dateTo').value = '';
+  document.getElementById('customFrom').style.display = 'none';
+  document.getElementById('customTo').style.display = 'none';
+  renderDashboard();
+  toast('Filters cleared');
+}
 
 function getFilteredForDashboard(){
   const {from,to} = getDateRange();
