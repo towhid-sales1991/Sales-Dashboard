@@ -5,6 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sales Analytics Dashboard</title>
 
+<!-- PWA support -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0a0e17">
+<meta name="background-color" content="#0a0e17">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+
 <!-- Libraries -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -1768,6 +1775,13 @@ window.addEventListener('DOMContentLoaded', ()=>{
   }
   refreshData();
 });
+
+/* ---------- PWA: register service worker ---------- */
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('sw.js').catch(()=>{/* silent fail if offline-first not critical */});
+  });
+}
 </script>
 
 </body>
