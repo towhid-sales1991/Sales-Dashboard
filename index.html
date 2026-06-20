@@ -665,9 +665,10 @@ function monthToNumber(m){
 
 /* Normalize records[] (from Sheet) into RAW[] (used by all chart logic) */
 function buildRAW(){
-  RAW = records.map(r=>{
+  RAW = records.map((r, idx)=>{
     const d = parseDate(r.date);
     return {
+      _idx: idx,
       d: r.date || '',
       dateObj: d,
       m: d ? (d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')) : null,
@@ -1332,7 +1333,6 @@ function renderDataTable(filteredRows){
   }).join('') + '<th></th></tr></thead>';
 
   let tbody = '<tbody>' + pageRows.map((r)=>{
-    const realIdx = records.indexOf(records.find(rec => rec.pino===r.pi && rec.date===r.d && Number(rec.value)===r.val && rec.sales===r.sp));
     return `<tr>
       <td>${r.d}</td><td>${r.pi}</td><td>${r.cust}</td><td>${r.buyer}</td>
       <td>${r.item}</td>
@@ -1342,8 +1342,8 @@ function renderDataTable(filteredRows){
       <td class="num">${FMT$2(r.val)}</td>
       <td>${r.new?'<span class="pill" style="background:#D1FAE5;color:#059669;">Yes</span>':''}</td>
       <td>
-        <button class="row-del edit" onclick="editRecordByIndex(${realIdx})">Edit</button>
-        <button class="row-del" onclick="removeRecordByIndex(${realIdx})">Delete</button>
+        <button class="row-del edit" onclick="editRecordByIndex(${r._idx})">Edit</button>
+        <button class="row-del" onclick="removeRecordByIndex(${r._idx})">Delete</button>
       </td>
     </tr>`;
   }).join('') + '</tbody>';
