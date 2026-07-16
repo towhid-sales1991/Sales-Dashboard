@@ -251,9 +251,6 @@ footer.app-footer b{color:var(--ink-soft);}
   <div class="filt-group"><label>Factory</label>
     <select id="f-fac" class="ctrl"></select>
   </div>
-  <div class="filt-group"><label>Item</label>
-    <select id="f-gen" class="ctrl"></select>
-  </div>
   <div class="filt-group"><label>Month</label>
     <select id="f-month" class="ctrl"></select>
   </div>
@@ -266,11 +263,13 @@ footer.app-footer b{color:var(--ink-soft);}
 
 <div class="tabnav" id="tabnav">
   <button class="tab-btn active" data-tab="overview">Overview</button>
+  <button class="tab-btn" data-tab="quarterly">Quarterly</button>
   <button class="tab-btn" data-tab="sales">Sales Performance</button>
   <button class="tab-btn" data-tab="factory">Factory &amp; Product</button>
   <button class="tab-btn" data-tab="custbuyer">Customers &amp; Buyers</button>
   <button class="tab-btn" data-tab="projection">Targets &amp; Projection</button>
   <button class="tab-btn" data-tab="table">Data Table</button>
+  <button class="tab-btn" data-tab="quarterly">Quarterly</button>
   <button class="tab-btn" data-tab="entry">Add Entry</button>
   <button class="tab-btn" data-tab="targets">Targets</button>
 </div>
@@ -295,17 +294,55 @@ footer.app-footer b{color:var(--ink-soft);}
       <h3>Sales Person Comparison</h3>
       <p class="panel-sub">Total PI value by sales person</p>
       <div class="chart-wrap" style="height:260px;"><canvas id="chartSPBarOverview"></canvas></div>
-    </div>
-    <div class="panel">
-      <h3>Product Mix</h3>
-      <p class="panel-sub">Share of PI value by generic item type</p>
-      <div class="chart-wrap" style="height:260px;"><canvas id="chartGenDonut"></canvas></div>
-    </div>
+    </div></div>
   </div>
   <div class="actions-row">
     <button class="btn-export" id="btnExportExcelOv">⬇ Export Excel</button>
     <button class="btn-export alt" id="btnExportPdfOv">⬇ Export PDF</button>
     <button class="btn-export amber" id="btnExportHtmlOv">⬇ Download HTML Snapshot</button>
+  </div>
+</div>
+
+
+<!-- ===================== QUARTERLY VIEW ===================== -->
+<div class="view" id="view-quarterly">
+  <div class="page-head" style="margin-bottom:18px;">
+    <h2 style="font-family:'Sora',sans-serif;font-size:24px;font-weight:800;margin:0;color:var(--ink);">Quarterly Performance</h2>
+    <p style="color:var(--ink-soft);font-size:13px;margin:4px 0 0;">PI value KPIs and growth trend by quarter — auto-generated from your data.</p>
+  </div>
+
+  <!-- Quarterly KPI cards -->
+  <div id="kpi-quarterly" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:22px;"></div>
+
+  <div style="display:grid;grid-template-columns:1.3fr 1fr;gap:16px;margin-bottom:16px;">
+    <div class="panel">
+      <h3>Quarter-to-Quarter PI Value</h3>
+      <p class="panel-sub">Total invoiced value per quarter — all years combined</p>
+      <div class="chart-wrap" style="height:300px;"><canvas id="chartQTQBar"></canvas></div>
+    </div>
+    <div class="panel">
+      <h3>Quarter-to-Quarter Growth</h3>
+      <p class="panel-sub">% change from previous quarter</p>
+      <div class="chart-wrap" style="height:300px;"><canvas id="chartQTQGrowth"></canvas></div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+    <div class="panel">
+      <h3>Quarterly Sales by Person</h3>
+      <p class="panel-sub">PI value per sales person per quarter</p>
+      <div class="chart-wrap" style="height:300px;"><canvas id="chartQSPBar"></canvas></div>
+    </div>
+    <div class="panel">
+      <h3>Quarterly Factory Mix</h3>
+      <p class="panel-sub">PI value per factory per quarter (stacked)</p>
+      <div class="chart-wrap" style="height:300px;"><canvas id="chartQFacStacked"></canvas></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h3>Quarterly Summary Table</h3>
+    <div class="table-wrap"><table class="dt" id="tblQuarterly"></table></div>
   </div>
 </div>
 
@@ -348,11 +385,7 @@ footer.app-footer b{color:var(--ink-soft);}
     <div class="panel">
       <h3>Factory Summary</h3>
       <div class="table-wrap"><table class="dt" id="tblFactory"></table></div>
-    </div>
-    <div class="panel">
-      <h3>Product Type Summary</h3>
-      <div class="table-wrap"><table class="dt" id="tblGeneric"></table></div>
-    </div>
+    </div></div>
   </div>
 </div>
 
@@ -450,6 +483,54 @@ footer.app-footer b{color:var(--ink-soft);}
   </div>
 </div>
 
+
+<!-- ===================== QUARTERLY ===================== -->
+<div class="view" id="view-quarterly">
+  <div style="margin-bottom:18px;">
+    <div class="filters" style="margin-bottom:0;">
+      <div class="filt-group"><label>Year</label>
+        <select id="q-year" class="ctrl"></select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quarterly KPI cards -->
+  <div class="kpi-grid" id="kpi-quarterly" style="grid-template-columns:repeat(auto-fit,minmax(200px,1fr));margin-bottom:18px;"></div>
+
+  <!-- Q-to-Q trend chart -->
+  <div class="grid2" style="margin-bottom:16px;">
+    <div class="panel">
+      <h3>Quarterly PI Value — Trend</h3>
+      <p class="panel-sub">Total invoiced value per quarter, selected year</p>
+      <div class="chart-wrap" style="height:280px;"><canvas id="chartQTrend"></canvas></div>
+    </div>
+    <div class="panel">
+      <h3>Quarter vs Quarter — Sales Person</h3>
+      <p class="panel-sub">PI value contribution by sales person each quarter</p>
+      <div class="chart-wrap" style="height:280px;"><canvas id="chartQBySP"></canvas></div>
+    </div>
+  </div>
+
+  <div class="grid2" style="margin-bottom:16px;">
+    <div class="panel">
+      <h3>Factory Mix by Quarter</h3>
+      <p class="panel-sub">Value contribution by factory, per quarter</p>
+      <div class="chart-wrap" style="height:260px;"><canvas id="chartQFactory"></canvas></div>
+    </div>
+    <div class="panel">
+      <h3>Quarter-to-Quarter Growth</h3>
+      <p class="panel-sub">% change from previous quarter (overall + per sales person)</p>
+      <div class="chart-wrap" style="height:260px;"><canvas id="chartQGrowth"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Q detail table -->
+  <div class="panel">
+    <h3>Quarterly Summary — Sales Person Detail</h3>
+    <div class="table-wrap"><table class="dt" id="tblQuarterly"></table></div>
+  </div>
+</div>
+
 <!-- ===================== ADD ENTRY ===================== -->
 <div class="view" id="view-entry">
   <div class="panel">
@@ -471,18 +552,6 @@ footer.app-footer b{color:var(--ink-soft);}
       <div class="field">
         <label>Buyer Name</label>
         <input type="text" id="f_buyer" placeholder="e.g. H&M, Zara...">
-      </div>
-      <div class="field">
-        <label>Item Code</label>
-        <input type="text" id="f_itemcode" placeholder="e.g. ITM-3321">
-      </div>
-      <div class="field">
-        <label>Generic Item</label>
-        <select id="f_generic">
-          <option value="Nylon">Nylon</option>
-          <option value="Metal">Metal</option>
-          <option value="Vislon">Vislon</option>
-        </select>
       </div>
       <div class="field">
         <label>PI Value (USD)</label>
@@ -574,7 +643,7 @@ footer.app-footer b{color:var(--ink-soft);}
     <h3>Setup &amp; Connection</h3>
     <p class="panel-sub">Connect this dashboard to a shared Google Sheet so all colleagues see the same live data.</p>
     <div class="setup-steps">
-      <div class="step"><div class="stepnum">1</div><div class="txt">Create a Google Sheet with a <code>Sales</code> tab (headers: PI Date, Proforma Invoice No, Customer Name, Buyer Name, Item Code, Generic Item, PI Value, Factory, Sales Person Name, New Sales) and a <code>Targets</code> tab (headers: Sales Person, Year, Month, Target Value (USD)).</div></div>
+      <div class="step"><div class="stepnum">1</div><div class="txt">Create a Google Sheet with a <code>Sales</code> tab (headers: PI Date, Proforma Invoice No, Customer Name, Buyer Name, PI Value, Factory, Sales Person Name, New Sales) and a <code>Targets</code> tab (headers: Sales Person, Year, Month, Target Value (USD)).</div></div>
       <div class="step"><div class="stepnum">2</div><div class="txt">Deploy an Apps Script Web App bound to that sheet, and paste its <code>/exec</code> URL below.</div></div>
     </div>
     <div class="form-grid" style="margin-top:18px;grid-template-columns:1fr;">
@@ -616,7 +685,6 @@ const FMT_PCT = (v) => (v>=0?'+':'') + v.toFixed(1) + '%';
 
 const SP_PALETTE  = ['#6366F1','#14B8A6','#FB7185','#F59E0B','#A78BFA','#38BDF8','#34D399','#D4A537'];
 const FAC_COLORS = { IFBD:'#6366F1', IFA:'#14B8A6', IFJS:'#A78BFA', IFI:'#38BDF8' };
-const GEN_COLORS = { Metal:'#6366F1', Nylon:'#14B8A6', Vislon:'#F59E0B' };
 const PALETTE    = ['#6366F1','#14B8A6','#FB7185','#F59E0B','#A78BFA','#38BDF8','#34D399','#D4A537','#F472B6','#60A5FA'];
 const MONTH_SHORT_ARR = ['','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const MONTH_NAMES_GLOBAL = ['','January','February','March','April','May','June','July','August','September','October','November','December'];
@@ -636,7 +704,7 @@ Chart.defaults.plugins.legend.labels.padding = 14;
 function killChart(id){ if(charts[id]){ charts[id].destroy(); delete charts[id]; } }
 
 /* ---------------- filter state ---------------- */
-const state = { sp:'ALL', fac:'ALL', gen:'ALL', month:'ALL', year:'ALL', growth:20 };
+const state = { sp:'ALL', fac:'ALL', month:'ALL', year:'ALL', growth:20 };
 
 /* ---------------- date parsing (robust) ---------------- */
 function parseDate(str){
@@ -677,8 +745,6 @@ function buildRAW(){
       pi: String(r.pino ?? ''),
       cust: String(r.customer ?? ''),
       buyer: String(r.buyer ?? ''),
-      item: String(r.itemcode ?? ''),
-      gen: String(r.generic ?? 'Unknown'),
       val: Number(r.value||0),
       fac: String(r.factory ?? 'Unknown'),
       sp: String(r.sales ?? 'Unknown'),
@@ -829,26 +895,22 @@ function getMonthsForYear(year){
 function populateFilters(){
   const fSp = document.getElementById('f-sp');
   const fFac = document.getElementById('f-fac');
-  const fGen = document.getElementById('f-gen');
   const fMonth = document.getElementById('f-month');
   const fYear = document.getElementById('f-year');
 
   const spList  = [...new Set(RAW.map(r=>r.sp))].sort();
   const facList = [...new Set(RAW.map(r=>r.fac))].sort();
-  const genList = [...new Set(RAW.map(r=>r.gen))].sort();
   const years = getYearsAvailable();
 
-  const keepSp = fSp.value, keepFac = fFac.value, keepGen = fGen.value, keepMonth = fMonth.value, keepYear = fYear.value;
+  const keepSp = fSp.value, keepFac = fFac.value = fGen.value, keepMonth = fMonth.value, keepYear = fYear.value;
 
   fSp.innerHTML = '<option value="ALL">All Sales Persons</option>' + spList.map(s=>`<option value="${s}">${s}</option>`).join('');
   fFac.innerHTML = '<option value="ALL">All Factories</option>' + facList.map(f=>`<option value="${f}">${f}</option>`).join('');
-  fGen.innerHTML = '<option value="ALL">All Items</option>' + genList.map(g=>`<option value="${g}">${g}</option>`).join('');
   fYear.innerHTML = '<option value="ALL">All Years</option>' + years.map(y=>`<option value="${y}">${y}</option>`).join('');
   fMonth.innerHTML = '<option value="ALL">All Months</option>' + Array.from({length:12},(_,i)=>i+1).map(m=>`<option value="${m}">${MONTH_NAMES_GLOBAL[m]}</option>`).join('');
 
   if(spList.includes(keepSp)) fSp.value = keepSp; else state.sp='ALL';
   if(facList.includes(keepFac)) fFac.value = keepFac; else state.fac='ALL';
-  if(genList.includes(keepGen)) fGen.value = keepGen; else state.gen='ALL';
   if(years.map(String).includes(keepYear)) fYear.value = keepYear; else state.year='ALL';
   if(keepMonth && keepMonth!=='ALL') fMonth.value = keepMonth; else state.month='ALL';
 
@@ -860,7 +922,7 @@ function populateFilters(){
     fYear.addEventListener('change', e=>{ state.year = e.target.value; renderAll(); });
     document.getElementById('btnReset').addEventListener('click', ()=>{
       state.sp='ALL'; state.fac='ALL'; state.gen='ALL'; state.month='ALL'; state.year='ALL';
-      fSp.value='ALL'; fFac.value='ALL'; fGen.value='ALL'; fMonth.value='ALL'; fYear.value='ALL';
+      fSp.value='ALL'; fFac.value='ALL'; fMonth.value='ALL'; fYear.value='ALL';
       renderAll();
     });
     fSp.dataset.init = '1';
@@ -871,7 +933,6 @@ function getFiltered(){
   return RAW.filter(r =>
     (state.sp==='ALL' || r.sp===state.sp) &&
     (state.fac==='ALL' || r.fac===state.fac) &&
-    (state.gen==='ALL' || r.gen===state.gen) &&
     (state.month==='ALL' || r.month===Number(state.month)) &&
     (state.year==='ALL' || r.year===Number(state.year))
   );
@@ -929,7 +990,7 @@ function renderOverviewKPIs(rows){
 }
 
 function renderOverviewCharts(rows){
-  const trendBase = RAW.filter(r => (state.sp==='ALL' || r.sp===state.sp) && (state.fac==='ALL' || r.fac===state.fac) && (state.gen==='ALL' || r.gen===state.gen));
+  const trendBase = RAW.filter(r => (state.sp==='ALL' || r.sp===state.sp) && (state.fac==='ALL' || r.fac===state.fac));
   const yearsToShow = state.year==='ALL' ? getYearsAvailable() : [Number(state.year)];
   const labels = [];
   const trendVals = [];
@@ -975,30 +1036,19 @@ function renderOverviewCharts(rows){
       plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:c=>' '+FMT$(c.parsed.y) } } },
       scales:{ y:{ ticks:{ callback:v=>'$'+(v/1000).toFixed(0)+'k' }, grid:{color:'#F1F3FB'} }, x:{ grid:{display:false} } } }
   });
-
-  const genMap = sumBy(rows, r=>r.gen);
-  const genSorted = sortMapDesc(genMap);
-  killChart('genDonut');
-  charts['genDonut'] = new Chart(document.getElementById('chartGenDonut'), {
-    type:'doughnut',
-    data:{ labels: genSorted.map(d=>d[0]), datasets:[{ data: genSorted.map(d=>d[1]),
-      backgroundColor: genSorted.map(d=>GEN_COLORS[d[0]]||'#9AA1B5'), borderWidth:3, borderColor:'#fff' }] },
-    options:{ responsive:true, maintainAspectRatio:false, cutout:'62%',
-      plugins:{ legend:{position:'right'}, tooltip:{ callbacks:{ label:c=>` ${c.label}: ${FMT$(c.parsed)}` } } } }
-  });
 }
 
 /* ============================================================
    SALES PERFORMANCE TAB
    ============================================================ */
 function getActiveMonths(){
-  const base = RAW.filter(r => (state.sp==='ALL' || r.sp===state.sp) && (state.fac==='ALL' || r.fac===state.fac) && (state.gen==='ALL' || r.gen===state.gen) && (state.year==='ALL' || r.year===Number(state.year)));
+  const base = RAW.filter(r => (state.sp==='ALL' || r.sp===state.sp) && (state.fac==='ALL' || r.fac===state.fac) && (state.year==='ALL' || r.year===Number(state.year)));
   const set = new Set(base.map(r=>r.year+'-'+String(r.month).padStart(2,'0')));
   return Array.from(set).sort();
 }
 
 function renderSalesTab(rows){
-  const base = RAW.filter(r => (state.fac==='ALL' || r.fac===state.fac) && (state.gen==='ALL' || r.gen===state.gen) && (state.year==='ALL' || r.year===Number(state.year)));
+  const base = RAW.filter(r => (state.fac==='ALL' || r.fac===state.fac) && (state.year==='ALL' || r.year===Number(state.year)));
   const spList = [...new Set(base.map(r=>r.sp))].sort();
   const monthKeys = getActiveMonths();
 
@@ -1091,18 +1141,6 @@ function renderFactoryTab(rows){
       <td class="bar-cell"><div class="bar-fill" style="width:${pct}%;background:${FAC_COLORS[fac]||'#9AA1B5'}"></div></td></tr>`;
   }).join('') + '</tbody>';
   document.getElementById('tblFactory').innerHTML = fThead + fTbody;
-
-  const genMap = sumBy(rows, r=>r.gen);
-  const genSorted = sortMapDesc(genMap);
-  const genCounts = countBy(rows, r=>r.gen);
-  let gThead = '<thead><tr><th>Item Type</th><th>PI Value</th><th>% of Total</th><th># PIs</th><th>Share</th></tr></thead>';
-  let gTbody = '<tbody>' + genSorted.map(([gen,val])=>{
-    const pct = totalAll? (val/totalAll*100):0;
-    return `<tr><td><span class="pill" style="background:${(GEN_COLORS[gen]||'#9AA1B5')}22;color:${GEN_COLORS[gen]||'#9AA1B5'}">${gen}</span></td>
-      <td class="num">${FMT$(val)}</td><td class="num">${pct.toFixed(1)}%</td><td class="num">${genCounts.get(gen)||0}</td>
-      <td class="bar-cell"><div class="bar-fill" style="width:${pct}%;background:${GEN_COLORS[gen]||'#9AA1B5'}"></div></td></tr>`;
-  }).join('') + '</tbody>';
-  document.getElementById('tblGeneric').innerHTML = gThead + gTbody;
 }
 
 /* ============================================================
@@ -1291,7 +1329,7 @@ const tableState = { page:1, pageSize:25, sortKey:'d', sortDir:-1, search:'', ne
 
 const COLS = [
   { key:'d', label:'PI Date' }, { key:'pi', label:'PI No.' }, { key:'cust', label:'Customer' },
-  { key:'buyer', label:'Buyer' }, { key:'item', label:'Item Code' }, { key:'gen', label:'Type' },
+  { key:'buyer', label:'Buyer' },
   { key:'fac', label:'Factory' }, { key:'sp', label:'Sales Person' }, { key:'val', label:'PI Value (USD)', num:true },
   { key:'new', label:'New' }
 ];
@@ -1304,7 +1342,6 @@ function getTableRows(filteredRows){
     rows = rows.filter(r =>
       String(r.cust||'').toLowerCase().includes(s) ||
       String(r.buyer||'').toLowerCase().includes(s) ||
-      String(r.item||'').toLowerCase().includes(s) ||
       String(r.pi||'').toLowerCase().includes(s) ||
       String(r.sp||'').toLowerCase().includes(s)
     );
@@ -1335,8 +1372,6 @@ function renderDataTable(filteredRows){
   let tbody = '<tbody>' + pageRows.map((r)=>{
     return `<tr>
       <td>${r.d}</td><td>${r.pi}</td><td>${r.cust}</td><td>${r.buyer}</td>
-      <td>${r.item}</td>
-      <td><span class="pill" style="background:${(GEN_COLORS[r.gen]||'#9AA1B5')}22;color:${GEN_COLORS[r.gen]||'#9AA1B5'}">${r.gen}</span></td>
       <td><span class="pill" style="background:${(FAC_COLORS[r.fac]||'#9AA1B5')}22;color:${FAC_COLORS[r.fac]||'#9AA1B5'}">${r.fac}</span></td>
       <td><span class="pill" style="background:${colorForSP(r.sp)}22;color:${colorForSP(r.sp)}">${r.sp}</span></td>
       <td class="num">${FMT$2(r.val)}</td>
@@ -1395,10 +1430,10 @@ function setupDataTableControls(){
 
 function exportCSV(){
   const rows = window._currentTableRows || [];
-  const header = ['PI Date','PI No','Customer','Buyer','Item Code','Generic Item','Factory','Sales Person','PI Value (USD)','New Sale'];
+  const header = ['PI Date','PI No','Customer','Buyer','Factory','Sales Person','PI Value (USD)','New Sale'];
   const lines = [header.join(',')];
   rows.forEach(r=>{
-    const vals = [r.d, r.pi, r.cust, r.buyer, r.item, r.gen, r.fac, r.sp, r.val.toFixed(2), r.new?'Yes':'No']
+    const vals = [r.d, r.pi, r.cust, r.buyer, r.fac, r.sp, r.val.toFixed(2), r.new?'Yes':'No']
       .map(v => `"${String(v).replace(/"/g,'""')}"`);
     lines.push(vals.join(','));
   });
@@ -1427,15 +1462,15 @@ function exportExcel(){
     ['Generated: '+new Date().toLocaleString()],
     ['Total PI Value: $'+total.toLocaleString(undefined,{minimumFractionDigits:2}), '', 'Total PIs: '+data.length, '', 'New Sales: '+newSalesCount+' ($'+newSalesValue.toLocaleString(undefined,{minimumFractionDigits:2})+')'],
     [],
-    ['PI Date','Proforma Invoice No','Customer Name','Buyer Name','Item Code','Generic Item','PI Value (USD)','Factory','Sales Person Name','New Sales']
+    ['PI Date','Proforma Invoice No','Customer Name','Buyer Name','PI Value (USD)','Factory','Sales Person Name','New Sales']
   ];
-  data.forEach(r=>{ aoa.push([r.d, r.pi, r.cust, r.buyer, r.item, r.gen, r.val, r.fac, r.sp, r.new?'Yes':'No']); });
+  data.forEach(r=>{ aoa.push([r.d, r.pi, r.cust, r.buyer, r.val, r.fac, r.sp, r.new?'Yes':'No']); });
   aoa.push([]);
   aoa.push(['Sales Dashboard is Developed & Designed by Towhid']);
 
   const ws = XLSX.utils.aoa_to_sheet(aoa);
-  ws['!merges'] = [{s:{r:0,c:0}, e:{r:0,c:9}}, {s:{r:1,c:0}, e:{r:1,c:9}}];
-  ws['!cols'] = [{wch:12},{wch:18},{wch:22},{wch:18},{wch:14},{wch:12},{wch:14},{wch:10},{wch:18},{wch:10}];
+  ws['!merges'] = [{s:{r:0,c:0}, e:{r:0,c:7}}, {s:{r:1,c:0}, e:{r:1,c:7}}];
+  ws['!cols'] = [{wch:12},{wch:18},{wch:22},{wch:18},{wch:14},{wch:10},{wch:18},{wch:10}];
   XLSX.utils.book_append_sheet(wb, ws, 'Sales Report');
 
   const aoa2 = [['VISUAL ANALYSIS DATA'],[]];
@@ -1445,7 +1480,6 @@ function exportExcel(){
     aoa2.push([]);
   };
   pushBreak('PI Value by Factory', sumBy(data, r=>r.fac));
-  pushBreak('Mix by Generic Item', sumBy(data, r=>r.gen));
   pushBreak('PI Value by Sales Person', sumBy(data, r=>r.sp));
   pushBreak('Top Customers', sumBy(data, r=>r.cust));
   pushBreak('Top Buyers', sumBy(data, r=>r.buyer));
@@ -1492,8 +1526,8 @@ async function exportPDF(){
 
   doc.autoTable({
     startY:34,
-    head:[['PI Date','PI No','Customer','Buyer','Item Code','Generic','PI Value (USD)','Factory','Sales Person','New Sales']],
-    body:data.map(r=>[r.d,r.pi,r.cust,r.buyer,r.item,r.gen,'$'+r.val.toLocaleString(undefined,{minimumFractionDigits:2}),r.fac,r.sp,r.new?'Yes':'No']),
+    head:[['PI Date','PI No','Customer','Buyer','PI Value (USD)','Factory','Sales Person','New Sales']],
+    body:data.map(r=>[r.d,r.pi,r.cust,r.buyer,'$'+r.val.toLocaleString(undefined,{minimumFractionDigits:2}),r.fac,r.sp,r.new?'Yes':'No']),
     styles:{ fontSize:8 },
     headStyles:{ fillColor:[99,102,241] }
   });
@@ -1503,7 +1537,6 @@ async function exportPDF(){
     {key:'trend', title:'PI Value Over Time'},
     {key:'facDonut', title:'Factory Mix'},
     {key:'spBarOv', title:'Sales Person Comparison'},
-    {key:'genDonut', title:'Product Mix'}
   ];
   for(let i=0;i<chartList.length;i+=2){
     doc.addPage();
@@ -1538,6 +1571,439 @@ function downloadHtmlSnapshot(){
   URL.revokeObjectURL(url);
 }
 
+
+/* ============================================================
+   QUARTERLY KPI + CHARTS
+   ============================================================ */
+
+function getQuarterKey(r) {
+  if (!r.year || !r.month) return null;
+  const q = Math.ceil(r.month / 3);
+  return r.year + '-Q' + q;
+}
+
+function renderQuarterlyTab(rows) {
+  // Build quarter map
+  const qMap = new Map();
+  rows.forEach(r => {
+    const key = getQuarterKey(r);
+    if (!key) return;
+    if (!qMap.has(key)) qMap.set(key, { total:0, count:0, sps:{}, facs:{} });
+    const q = qMap.get(key);
+    q.total += r.val;
+    q.count += 1;
+    q.sps[r.sp] = (q.sps[r.sp] || 0) + r.val;
+    q.facs[r.fac] = (q.facs[r.fac] || 0) + r.val;
+  });
+
+  const sortedKeys = Array.from(qMap.keys()).sort();
+  if (sortedKeys.length === 0) {
+    document.getElementById('kpi-quarterly').innerHTML =
+      '<p style="color:var(--ink-soft);grid-column:1/-1">No data available for current filter.</p>';
+    return;
+  }
+
+  // ── KPI cards ──
+  const kpiEl = document.getElementById('kpi-quarterly');
+  kpiEl.innerHTML = sortedKeys.map(key => {
+    const q = qMap.get(key);
+    const keyIdx = sortedKeys.indexOf(key);
+    const prevKey = keyIdx > 0 ? sortedKeys[keyIdx - 1] : null;
+    const prevTotal = prevKey ? qMap.get(prevKey).total : null;
+    const growth = prevTotal ? ((q.total - prevTotal) / prevTotal * 100) : null;
+    const growthStr = growth !== null
+      ? `<span style="color:${growth >= 0 ? 'var(--teal)' : 'var(--coral)'}">
+           ${growth >= 0 ? '▲' : '▼'} ${Math.abs(growth).toFixed(1)}% vs prev quarter
+         </span>`
+      : '<span style="color:var(--ink-faint)">First quarter</span>';
+    const accent = ['#6366F1','#14B8A6','#F59E0B','#FB7185','#A78BFA','#38BDF8'][sortedKeys.indexOf(key) % 6];
+    return `<div class="kpi-card" style="--accent:${accent}">
+      <p class="kpi-label">${key}</p>
+      <p class="kpi-value num">${FMT$(q.total)}</p>
+      <p class="kpi-sub">${q.count} PIs · ${growthStr}</p>
+    </div>`;
+  }).join('');
+
+  // ── Quarter-to-Quarter Bar ──
+  const qtqLabels = sortedKeys;
+  const qtqVals = sortedKeys.map(k => qMap.get(k).total);
+  const qtqColors = qtqLabels.map((_, i) =>
+    ['#6366F1','#14B8A6','#F59E0B','#FB7185','#A78BFA','#38BDF8'][i % 6]);
+
+  killChart('qtqBar');
+  charts['qtqBar'] = new Chart(document.getElementById('chartQTQBar'), {
+    type: 'bar',
+    data: {
+      labels: qtqLabels,
+      datasets: [{ label: 'PI Value', data: qtqVals, backgroundColor: qtqColors, borderRadius: 8 }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false },
+        tooltip: { callbacks: { label: c => ' ' + FMT$(c.parsed.y) } } },
+      scales: {
+        y: { ticks: { callback: v => '$' + (v/1000).toFixed(0) + 'K' }, grid: { color: '#F1F3FB' } },
+        x: { grid: { display: false } }
+      }
+    }
+  });
+
+  // ── Growth % Line ──
+  const growthVals = sortedKeys.map((k, i) => {
+    if (i === 0) return null;
+    const prev = qMap.get(sortedKeys[i - 1]).total;
+    return prev ? +((qMap.get(k).total - prev) / prev * 100).toFixed(1) : null;
+  });
+
+  killChart('qtqGrowth');
+  charts['qtqGrowth'] = new Chart(document.getElementById('chartQTQGrowth'), {
+    type: 'bar',
+    data: {
+      labels: qtqLabels,
+      datasets: [{
+        label: 'Growth %',
+        data: growthVals,
+        backgroundColor: growthVals.map(v => v === null ? '#E8EAF3' : v >= 0 ? 'rgba(20,184,166,0.7)' : 'rgba(251,113,133,0.7)'),
+        borderRadius: 8
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false },
+        tooltip: { callbacks: { label: c => c.parsed.y !== null ? ' ' + c.parsed.y + '%' : ' —' } } },
+      scales: {
+        y: { ticks: { callback: v => v + '%' }, grid: { color: '#F1F3FB' } },
+        x: { grid: { display: false } }
+      }
+    }
+  });
+
+  // ── Sales Person per Quarter (grouped bar) ──
+  const allSps = [...new Set(rows.map(r => r.sp))].sort();
+  const spQDatasets = allSps.map((sp, si) => ({
+    label: sp,
+    data: sortedKeys.map(k => qMap.get(k).sps[sp] || 0),
+    backgroundColor: colorForSP(sp),
+    borderRadius: 5
+  }));
+
+  killChart('qSPBar');
+  charts['qSPBar'] = new Chart(document.getElementById('chartQSPBar'), {
+    type: 'bar',
+    data: { labels: qtqLabels, datasets: spQDatasets },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'bottom', labels: { usePointStyle: true, boxWidth: 8, padding: 12 } },
+        tooltip: { callbacks: { label: c => ` ${c.dataset.label}: ${FMT$(c.parsed.y)}` } }
+      },
+      scales: {
+        y: { ticks: { callback: v => '$' + (v/1000).toFixed(0) + 'K' }, grid: { color: '#F1F3FB' } },
+        x: { grid: { display: false } }
+      }
+    }
+  });
+
+  // ── Factory stacked per Quarter ──
+  const allFacs = [...new Set(rows.map(r => r.fac))].sort();
+  const FAC_COLOR_LOCAL = { IFBD:'#6366F1', IFA:'#14B8A6', IFJS:'#A78BFA', IFI:'#38BDF8' };
+  const facQDatasets = allFacs.map(fac => ({
+    label: fac,
+    data: sortedKeys.map(k => qMap.get(k).facs[fac] || 0),
+    backgroundColor: FAC_COLOR_LOCAL[fac] || '#9AA1B5',
+    borderRadius: 4
+  }));
+
+  killChart('qFacStacked');
+  charts['qFacStacked'] = new Chart(document.getElementById('chartQFacStacked'), {
+    type: 'bar',
+    data: { labels: qtqLabels, datasets: facQDatasets },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'bottom', labels: { usePointStyle: true, boxWidth: 8, padding: 12 } },
+        tooltip: { callbacks: { label: c => ` ${c.dataset.label}: ${FMT$(c.parsed.y)}` } }
+      },
+      scales: {
+        x: { stacked: true, grid: { display: false } },
+        y: { stacked: true, ticks: { callback: v => '$' + (v/1000).toFixed(0) + 'K' }, grid: { color: '#F1F3FB' } }
+      }
+    }
+  });
+
+  // ── Summary Table ──
+  const thead = '<thead><tr><th>Quarter</th><th>PI Value</th><th># PIs</th><th>Avg PI Value</th><th>vs Prev Quarter</th><th>Top Sales Person</th><th>Top Factory</th></tr></thead>';
+  const tbody = '<tbody>' + sortedKeys.map((k, i) => {
+    const q = qMap.get(k);
+    const prev = i > 0 ? qMap.get(sortedKeys[i-1]).total : null;
+    const growth = prev ? ((q.total - prev) / prev * 100) : null;
+    const growthCell = growth !== null
+      ? `<span class="pill" style="background:${growth>=0?'#D1FAE5':'#FEE2E2'};color:${growth>=0?'#059669':'#DC2626'}">${growth>=0?'+':''}${growth.toFixed(1)}%</span>`
+      : '<span class="pill" style="background:#F1F3FB;color:#9AA1B5;">—</span>';
+    const topSP = Object.entries(q.sps).sort((a,b) => b[1]-a[1])[0];
+    const topFac = Object.entries(q.facs).sort((a,b) => b[1]-a[1])[0];
+    const rowBg = i % 2 === 0 ? '' : 'style="background:var(--bg-soft,#F7F8FC)"';
+    return `<tr ${rowBg}>
+      <td><strong>${k}</strong></td>
+      <td class="num">${FMT$(q.total)}</td>
+      <td class="num">${q.count}</td>
+      <td class="num">${FMT$(q.total / q.count)}</td>
+      <td>${growthCell}</td>
+      <td>${topSP ? topSP[0] : '—'}</td>
+      <td>${topFac ? topFac[0] : '—'}</td>
+    </tr>`;
+  }).join('') + '</tbody>';
+  document.getElementById('tblQuarterly').innerHTML = thead + tbody;
+}
+
+/* ============================================================
+   MASTER RENDER
+   ============================================================ */
+/* ============================================================
+   QUARTERLY TAB
+   ============================================================ */
+function getQuarterKey(r){
+  if(!r.year || !r.month) return null;
+  const q = Math.ceil(r.month / 3);
+  return { label: `Q${q} ${r.year}`, q, year: r.year, sortKey: r.year * 10 + q };
+}
+
+function populateQYearDropdown(){
+  const sel = document.getElementById('q-year');
+  if(!sel) return;
+  const years = [...new Set(RAW.map(r=>r.year).filter(Boolean))].sort((a,b)=>b-a);
+  const cur = sel.value;
+  sel.innerHTML = '<option value="ALL">All Years</option>' +
+    years.map(y=>`<option value="${y}">${y}</option>`).join('');
+  if(years.map(String).includes(cur)) sel.value = cur;
+  else sel.value = years[0] || 'ALL';
+  if(!sel.dataset.init){
+    sel.addEventListener('change', ()=> renderQuarterlyTab(getFiltered()));
+    sel.dataset.init='1';
+  }
+}
+
+function renderQuarterlyTab(rows){
+  populateQYearDropdown();
+
+  const selYear = document.getElementById('q-year')?.value;
+  const filteredRows = selYear && selYear!=='ALL'
+    ? rows.filter(r => r.year === Number(selYear))
+    : rows;
+
+  // Build quarter buckets
+  const qMap = {};
+  filteredRows.forEach(r => {
+    const qk = getQuarterKey(r);
+    if(!qk) return;
+    if(!qMap[qk.label]) qMap[qk.label] = { label: qk.label, q: qk.q, year: qk.year, sortKey: qk.sortKey, val: 0, count: 0, sp: {} };
+    qMap[qk.label].val   += r.val;
+    qMap[qk.label].count += 1;
+    qMap[qk.label].sp[r.sp] = (qMap[qk.label].sp[r.sp] || 0) + r.val;
+  });
+
+  const quarters = Object.values(qMap).sort((a,b) => a.sortKey - b.sortKey);
+  const qLabels  = quarters.map(q => q.label);
+
+  // ── KPI cards ──
+  const kpiEl = document.getElementById('kpi-quarterly');
+  if(kpiEl){
+    if(quarters.length === 0){
+      kpiEl.innerHTML = `<div style="color:var(--ink-soft);font-size:13px;padding:10px;">No data for selected year. Try a different year or add data first.</div>`;
+    } else {
+      const bestQ = quarters.reduce((a,b) => b.val>a.val ? b : a);
+      const totalVal = quarters.reduce((s,q) => s+q.val, 0);
+
+      // Q-to-Q growth for latest quarter
+      let latestGrowth = null;
+      if(quarters.length >= 2){
+        const last = quarters[quarters.length-1];
+        const prev = quarters[quarters.length-2];
+        latestGrowth = prev.val ? ((last.val - prev.val)/prev.val*100) : null;
+      }
+
+      kpiEl.innerHTML = quarters.map(q => {
+        const pct = totalVal ? (q.val/totalVal*100).toFixed(1)+'%' : '—';
+        let prevQ = null;
+        const idx = quarters.indexOf(q);
+        if(idx > 0) prevQ = quarters[idx-1];
+        const growth = prevQ && prevQ.val ? ((q.val-prevQ.val)/prevQ.val*100) : null;
+        const growthStr = growth !== null ? (growth>=0?'+':'')+growth.toFixed(1)+'% vs prev Q' : 'First quarter';
+        const accent = q.q===1?'#6366F1':q.q===2?'#14B8A6':q.q===3?'#F59E0B':'#FB7185';
+        return `<div class="kpi-card" style="--accent:${accent}">
+          <p class="kpi-label">${q.label}</p>
+          <p class="kpi-value num">$${Math.round(q.val).toLocaleString('en-US')}</p>
+          <p class="kpi-sub">${q.count} PIs · ${pct} of year · <b>${growthStr}</b></p>
+        </div>`;
+      }).join('');
+    }
+  }
+
+  // ── Quarterly Trend chart ──
+  killChart('qTrend');
+  if(quarters.length > 0){
+    const Q_COLORS = ['#6366F1','#14B8A6','#F59E0B','#FB7185'];
+    charts['qTrend'] = new Chart(document.getElementById('chartQTrend'), {
+      type: 'bar',
+      data: {
+        labels: qLabels,
+        datasets: [{
+          label: 'PI Value',
+          data: quarters.map(q=>q.val),
+          backgroundColor: quarters.map(q=>Q_COLORS[(q.q-1)%4]),
+          borderRadius: 8, maxBarThickness: 60
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label: c=>' $'+Math.round(c.parsed.y).toLocaleString('en-US') } } },
+        scales:{ y:{ ticks:{ callback:v=>'$'+(v/1000).toFixed(0)+'K' }, grid:{color:'#F1F3FB'} }, x:{grid:{display:false}} }
+      }
+    });
+  }
+
+  // ── Q by Sales Person grouped bar chart ──
+  killChart('qBySP');
+  if(quarters.length > 0){
+    const allSPs = [...new Set(filteredRows.map(r=>r.sp))].sort();
+    const spDatasets = allSPs.map((sp,i) => ({
+      label: sp,
+      data: quarters.map(q => q.sp[sp] || 0),
+      backgroundColor: SP_PALETTE[i % SP_PALETTE.length],
+      borderRadius: 6, maxBarThickness: 36
+    }));
+    charts['qBySP'] = new Chart(document.getElementById('chartQBySP'), {
+      type: 'bar',
+      data: { labels: qLabels, datasets: spDatasets },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins:{ legend:{position:'bottom'}, tooltip:{ callbacks:{ label: c=>` ${c.dataset.label}: $${Math.round(c.parsed.y).toLocaleString('en-US')}` } } },
+        scales:{ y:{ ticks:{ callback:v=>'$'+(v/1000).toFixed(0)+'K' }, grid:{color:'#F1F3FB'} }, x:{grid:{display:false}} }
+      }
+    });
+  }
+
+  // ── Factory by Quarter stacked bar ──
+  killChart('qFactory');
+  if(quarters.length > 0){
+    const allFacs = [...new Set(filteredRows.map(r=>r.fac))].sort();
+    const facQData = {};
+    filteredRows.forEach(r=>{
+      const qk = getQuarterKey(r);
+      if(!qk) return;
+      if(!facQData[r.fac]) facQData[r.fac] = {};
+      facQData[r.fac][qk.label] = (facQData[r.fac][qk.label] || 0) + r.val;
+    });
+    const facDatasets = allFacs.map(fac=>({
+      label: fac,
+      data: qLabels.map(ql => facQData[fac]?.[ql] || 0),
+      backgroundColor: FAC_COLORS[fac] || '#9AA1B5',
+      borderRadius: 4
+    }));
+    charts['qFactory'] = new Chart(document.getElementById('chartQFactory'), {
+      type: 'bar',
+      data: { labels: qLabels, datasets: facDatasets },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins:{ legend:{position:'bottom'}, tooltip:{ callbacks:{ label: c=>` ${c.dataset.label}: $${Math.round(c.parsed.y).toLocaleString('en-US')}` } } },
+        scales:{ x:{stacked:true, grid:{display:false}}, y:{ stacked:true, ticks:{ callback:v=>'$'+(v/1000).toFixed(0)+'K' }, grid:{color:'#F1F3FB'} } }
+      }
+    });
+  }
+
+  // ── Q-to-Q Growth line chart ──
+  killChart('qGrowth');
+  if(quarters.length >= 2){
+    const allSPs = [...new Set(filteredRows.map(r=>r.sp))].sort();
+    // Overall growth line
+    const overallGrowth = quarters.map((q,i) => {
+      if(i===0) return null;
+      const prev = quarters[i-1];
+      return prev.val ? parseFloat(((q.val - prev.val)/prev.val*100).toFixed(1)) : null;
+    });
+    const growthDatasets = [{
+      label: 'Overall',
+      data: overallGrowth,
+      borderColor: '#161A2E',
+      backgroundColor: '#161A2E',
+      borderWidth: 3, pointRadius: 5, tension: 0.3, fill: false,
+      borderDash: [6,3]
+    }];
+    allSPs.forEach((sp,i)=>{
+      const spGrowth = quarters.map((q,idx)=>{
+        if(idx===0) return null;
+        const prev = quarters[idx-1];
+        const prevVal = prev.sp[sp] || 0;
+        const curVal  = q.sp[sp] || 0;
+        return prevVal ? parseFloat(((curVal-prevVal)/prevVal*100).toFixed(1)) : null;
+      });
+      growthDatasets.push({
+        label: sp,
+        data: spGrowth,
+        borderColor: SP_PALETTE[i % SP_PALETTE.length],
+        backgroundColor: SP_PALETTE[i % SP_PALETTE.length],
+        borderWidth: 2, pointRadius: 4, tension: 0.3, fill: false
+      });
+    });
+    charts['qGrowth'] = new Chart(document.getElementById('chartQGrowth'), {
+      type: 'line',
+      data: { labels: qLabels, datasets: growthDatasets },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins:{ legend:{position:'bottom'}, tooltip:{ callbacks:{ label: c=>` ${c.dataset.label}: ${c.parsed.y !== null ? (c.parsed.y>=0?'+':'')+c.parsed.y+'%' : 'N/A'}` } } },
+        scales:{
+          y:{ ticks:{ callback: v=>(v>=0?'+':'')+v+'%' }, grid:{color:'#F1F3FB'} },
+          x:{ grid:{display:false} }
+        }
+      }
+    });
+  } else {
+    // Not enough quarters for growth
+    const ctx = document.getElementById('chartQGrowth').getContext('2d');
+    ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height);
+  }
+
+  // ── Summary Table ──
+  const tbl = document.getElementById('tblQuarterly');
+  if(quarters.length === 0){
+    tbl.innerHTML = '<tbody><tr><td colspan="6" style="text-align:center;color:var(--ink-soft);padding:30px;">No data for selected filter.</td></tr></tbody>';
+    return;
+  }
+  const allSPs = [...new Set(filteredRows.map(r=>r.sp))].sort();
+  let thead = '<thead><tr><th>Sales Person</th>' + qLabels.map(l=>`<th>${l}</th>`).join('') + '<th>Total</th></tr></thead>';
+  let tbody = '<tbody>';
+
+  // Per SP rows
+  allSPs.forEach(sp => {
+    let rowTotal = 0;
+    const cells = quarters.map(q => {
+      const v = q.sp[sp] || 0;
+      rowTotal += v;
+      return `<td class="num">$${Math.round(v).toLocaleString('en-US')}</td>`;
+    }).join('');
+    tbody += `<tr><td><span class="pill" style="background:${colorForSP(sp)}22;color:${colorForSP(sp)}">${sp}</span></td>${cells}<td class="num" style="font-weight:800;">$${Math.round(rowTotal).toLocaleString('en-US')}</td></tr>`;
+  });
+
+  // Total row
+  const totCells = quarters.map(q=>`<td class="num" style="font-weight:800;">$${Math.round(q.val).toLocaleString('en-US')}</td>`).join('');
+  const grandTotal = quarters.reduce((s,q)=>s+q.val,0);
+  tbody += `<tr style="background:var(--bg-tint);"><td style="font-weight:800;">TOTAL</td>${totCells}<td class="num" style="font-weight:800;">$${Math.round(grandTotal).toLocaleString('en-US')}</td></tr>`;
+
+  // Q-to-Q growth row
+  const growthCells = quarters.map((q,i) => {
+    if(i===0) return `<td class="num" style="color:var(--ink-faint);">—</td>`;
+    const prev = quarters[i-1];
+    const pct = prev.val ? ((q.val-prev.val)/prev.val*100) : null;
+    const color = pct === null ? 'var(--ink-faint)' : pct>=0 ? '#059669' : '#DC2626';
+    const text = pct === null ? '—' : (pct>=0?'+':'')+pct.toFixed(1)+'%';
+    return `<td class="num" style="color:${color};font-weight:700;">${text}</td>`;
+  }).join('');
+  tbody += `<tr style="background:var(--bg-tint);"><td style="font-weight:700;color:var(--ink-soft);">Q-to-Q Growth</td>${growthCells}<td></td></tr>`;
+
+  tbody += '</tbody>';
+  tbl.innerHTML = thead + tbody;
+}
+
 /* ============================================================
    MASTER RENDER
    ============================================================ */
@@ -1547,6 +2013,7 @@ function renderAll(){
   const activeTab = document.querySelector('.tab-btn.active').dataset.tab;
 
   if(activeTab==='overview'){ renderOverviewKPIs(rows); renderOverviewCharts(rows); }
+  if(activeTab==='quarterly'){ renderQuarterlyTab(rows); }
   if(activeTab==='sales'){ renderSalesTab(rows); }
   if(activeTab==='factory'){ renderFactoryTab(rows); }
   if(activeTab==='custbuyer'){ renderCustBuyerTab(rows); }
@@ -1558,8 +2025,7 @@ function renderAll(){
    DAILY ENTRY (Add / Edit)
    ============================================================ */
 function clearForm(){
-  ['f_date','f_pino','f_customer','f_buyer','f_itemcode','f_value','f_sales'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('f_generic').value='Nylon';
+  ['f_date','f_pino','f_customer','f_buyer','f_value','f_sales'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('f_factory').value='IFBD';
   document.getElementById('f_newsales').value='No';
   editingRowIndex = null;
@@ -1573,8 +2039,6 @@ async function addRecord(){
     pino: document.getElementById('f_pino').value.trim(),
     customer: document.getElementById('f_customer').value.trim(),
     buyer: document.getElementById('f_buyer').value.trim(),
-    itemcode: document.getElementById('f_itemcode').value.trim(),
-    generic: document.getElementById('f_generic').value,
     value: parseFloat(document.getElementById('f_value').value) || 0,
     factory: document.getElementById('f_factory').value,
     sales: document.getElementById('f_sales').value.trim(),
@@ -1621,8 +2085,7 @@ function editRecordByIndex(realIndex){
   document.getElementById('f_pino').value = rec.pino || '';
   document.getElementById('f_customer').value = rec.customer || '';
   document.getElementById('f_buyer').value = rec.buyer || '';
-  document.getElementById('f_itemcode').value = rec.itemcode || '';
-  document.getElementById('f_generic').value = rec.generic || 'Nylon';
+
   document.getElementById('f_value').value = rec.value || '';
   document.getElementById('f_factory').value = rec.factory || 'IFBD';
   document.getElementById('f_sales').value = rec.sales || '';
