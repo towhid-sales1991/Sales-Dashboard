@@ -719,17 +719,31 @@ async function refreshData(){
     afterDataLoaded();
     return;
   }
+  let data;
   try{
     const res = await fetch(SCRIPT_URL+'?action=read');
-    const data = await res.json();
-    records = data.records || [];
-    targets = data.targets || [];
-    const statusEl = document.getElementById('setupStatus');
-    if(statusEl) statusEl.textContent = 'Connected successfully. ' + records.length + ' records loaded.';
-    afterDataLoaded();
+    data = await res.json();
   }catch(e){
+    console.error('Fetch/parse failed:', e);
     const statusEl = document.getElementById('setupStatus');
     if(statusEl) statusEl.textContent = 'Connection error — could not reach Google Sheet.';
+    return;
+  }
+  if(data && data.error){
+    console.error('Backend reported error:', data.error);
+    const statusEl = document.getElementById('setupStatus');
+    if(statusEl) statusEl.textContent = 'Backend error: ' + data.error;
+    return;
+  }
+  records = (data && data.records) || [];
+  targets = (data && data.targets) || [];
+  const statusEl = document.getElementById('setupStatus');
+  if(statusEl) statusEl.textContent = 'Connected successfully. ' + records.length + ' records loaded.';
+  try{
+    afterDataLoaded();
+  }catch(e){
+    console.error('Rendering failed after data load:', e);
+    if(statusEl) statusEl.textContent = 'Data loaded (' + records.length + ' records) but rendering failed — see console (F12).';
   }
 }
 
