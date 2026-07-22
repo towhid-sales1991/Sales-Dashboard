@@ -863,7 +863,7 @@ function populateFilters(){
   const facList = [...new Set(RAW.map(r=>r.fac))].sort();
   const years = getYearsAvailable();
 
-  const keepSp = fSp.value, keepFac = fFac.value = fGen.value, keepMonth = fMonth.value, keepYear = fYear.value;
+  const keepSp = fSp.value, keepFac = fFac.value, keepMonth = fMonth.value, keepYear = fYear.value;
 
   fSp.innerHTML = '<option value="ALL">All Sales Persons</option>' + spList.map(s=>`<option value="${s}">${s}</option>`).join('');
   fFac.innerHTML = '<option value="ALL">All Factories</option>' + facList.map(f=>`<option value="${f}">${f}</option>`).join('');
@@ -878,7 +878,6 @@ function populateFilters(){
   if(!fSp.dataset.init){
     fSp.addEventListener('change', e=>{ state.sp = e.target.value; renderAll(); });
     fFac.addEventListener('change', e=>{ state.fac = e.target.value; renderAll(); });
-    fGen.addEventListener('change', e=>{ state.gen = e.target.value; renderAll(); });
     fMonth.addEventListener('change', e=>{ state.month = e.target.value; renderAll(); });
     fYear.addEventListener('change', e=>{ state.year = e.target.value; renderAll(); });
     document.getElementById('btnReset').addEventListener('click', ()=>{
