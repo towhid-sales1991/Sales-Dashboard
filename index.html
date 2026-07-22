@@ -304,6 +304,133 @@ footer.app-footer b{color:var(--ink-soft);}
 </div>
 
 
+<!-- ===================== SALES PERFORMANCE ===================== -->
+<div class="view" id="view-sales">
+  <div class="grid2">
+    <div class="panel">
+      <h3>Sales Person — Monthly Trend</h3>
+      <p class="panel-sub">PI value by month, per sales person</p>
+      <div class="chart-wrap" style="height:280px;"><canvas id="chartSPMonthlyLine"></canvas></div>
+    </div>
+    <div class="panel">
+      <h3>Sales Person Share</h3>
+      <p class="panel-sub">Share of total PI value by sales person</p>
+      <div class="chart-wrap" style="height:280px;"><canvas id="chartSPDonut"></canvas></div>
+    </div>
+  </div>
+  <div class="panel">
+    <h3>Sales Person × Month — Detail</h3>
+    <div class="table-wrap"><table class="dt" id="tblSPMonth"></table></div>
+  </div>
+</div>
+
+<!-- ===================== FACTORY & PRODUCT ===================== -->
+<div class="view" id="view-factory">
+  <div class="grid2">
+    <div class="panel">
+      <h3>Factory Comparison</h3>
+      <p class="panel-sub">Total PI value by factory</p>
+      <div class="chart-wrap" style="height:280px;"><canvas id="chartFacBar"></canvas></div>
+    </div>
+    <div class="panel">
+      <h3>Factory Mix — Monthly</h3>
+      <p class="panel-sub">Stacked PI value by factory, per month</p>
+      <div class="chart-wrap" style="height:280px;"><canvas id="chartFacStacked"></canvas></div>
+    </div>
+  </div>
+  <div class="panel">
+    <h3>Factory Summary</h3>
+    <div class="table-wrap"><table class="dt" id="tblFactory"></table></div>
+  </div>
+</div>
+
+<!-- ===================== CUSTOMERS & BUYERS ===================== -->
+<div class="view" id="view-custbuyer">
+  <div class="grid2">
+    <div class="panel">
+      <h3>Top 10 Customers</h3>
+      <p class="panel-sub">By total PI value</p>
+      <div class="chart-wrap" style="height:320px;"><canvas id="chartTopCust"></canvas></div>
+    </div>
+    <div class="panel">
+      <h3>Top 10 Buyers</h3>
+      <p class="panel-sub">By total PI value</p>
+      <div class="chart-wrap" style="height:320px;"><canvas id="chartTopBuyer"></canvas></div>
+    </div>
+  </div>
+  <div class="grid2">
+    <div class="panel">
+      <h3>Customer Detail (Top 30)</h3>
+      <div class="table-wrap"><table class="dt" id="tblCust"></table></div>
+    </div>
+    <div class="panel">
+      <h3>Buyer Detail (Top 30)</h3>
+      <div class="table-wrap"><table class="dt" id="tblBuyer"></table></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== TARGETS & PROJECTION ===================== -->
+<div class="view" id="view-projection">
+  <div class="assume-card">
+    <div class="txt"><b>Projection assumption:</b> future-period value is estimated by applying a growth rate to actual achievement.</div>
+    <div class="rate-input-wrap">
+      <span class="rate-label">Growth</span>
+      <input type="number" id="growthRate" class="ctrl" value="20" style="width:56px;">
+      <span>%</span>
+    </div>
+  </div>
+  <div class="kpi-grid" id="kpi-projection"></div>
+  <div class="grid2">
+    <div class="panel">
+      <h3>Target vs Achievement</h3>
+      <p class="panel-sub" id="targetBarSub"></p>
+      <div class="chart-wrap" style="height:280px;"><canvas id="chartTargetBar"></canvas></div>
+    </div>
+    <div class="panel">
+      <h3>Achievement vs Projected</h3>
+      <p class="panel-sub">By sales person, at the selected growth rate</p>
+      <div class="chart-wrap" style="height:280px;"><canvas id="chartProjBar"></canvas></div>
+    </div>
+  </div>
+  <div class="grid2">
+    <div class="panel">
+      <h3>Target vs Achievement — Monthly</h3>
+      <p class="panel-sub" id="targetMonthlySub"></p>
+      <div class="chart-wrap" style="height:280px;"><canvas id="chartTargetMonthly"></canvas></div>
+    </div>
+    <div class="panel">
+      <h3>Achievement vs Projected — Monthly</h3>
+      <p class="panel-sub" id="projMonthlySub"></p>
+      <div class="chart-wrap" style="height:280px;"><canvas id="chartProjMonthly"></canvas></div>
+    </div>
+  </div>
+  <div class="panel">
+    <h3>Projection Detail</h3>
+    <div class="table-wrap"><table class="dt" id="tblProjection"></table></div>
+  </div>
+</div>
+
+<!-- ===================== DATA TABLE ===================== -->
+<div class="view" id="view-table">
+  <div class="panel">
+    <div class="table-controls">
+      <div class="search-box"><input type="text" id="dtSearch" class="ctrl" placeholder="Search customer, buyer, PI no, sales person..." style="width:100%;"></div>
+      <label class="chk"><input type="checkbox" id="dtNewOnly"> New sales only</label>
+      <button class="btn-export" id="btnExportCsv">⬇ Export CSV</button>
+      <button class="btn-export alt" id="btnRefreshTbl">↻ Refresh</button>
+    </div>
+    <div class="table-wrap"><table class="dt" id="tblMain"></table></div>
+    <div class="pager">
+      <span id="pageInfo"></span>
+      <button id="pgFirst">« First</button>
+      <button id="pgPrev">‹ Prev</button>
+      <button id="pgNext">Next ›</button>
+      <button id="pgLast">Last »</button>
+    </div>
+  </div>
+</div>
+
 <!-- ===================== QUARTERLY VIEW ===================== -->
 <div class="view" id="view-quarterly">
   <div style="margin-bottom:18px;">
